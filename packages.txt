@@ -1,4 +1,2 @@
-# apt packages installed by Streamlit Community Cloud at deploy time.
-# Required for opencv-python-headless on the cloud's slim base image.
 libgl1
 libglib2.0-0

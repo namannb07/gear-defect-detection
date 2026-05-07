@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import io
-import os
 import sys
 from pathlib import Path
 
@@ -13,24 +12,6 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-
-def _cloud_env() -> str | None:
-    """Detect a hosted Streamlit environment. Returns 'hf', 'streamlit', or None."""
-    if os.environ.get("SPACE_ID") or os.environ.get("SPACE_HOST"):
-        return "hf"
-    if (
-        "/mount/src/" in str(_PROJECT_ROOT)
-        or os.environ.get("STREAMLIT_RUNTIME_ENV") == "cloud"
-        or os.environ.get("HOSTNAME", "").startswith("streamlit")
-    ):
-        return "streamlit"
-    return None
-
-
-def _is_cloud() -> bool:
-    return _cloud_env() is not None
-
-import numpy as np
 import streamlit as st
 from PIL import Image
 
@@ -39,9 +20,6 @@ from app.model import get_model
 from app.utils import (
     DEFAULT_CHECKPOINT,
     DEFAULT_THRESHOLD,
-    OUTPUTS_DIR,
-    apply_heatmap,
-    get_device,
     make_composite,
 )
 
@@ -113,22 +91,12 @@ def main() -> None:
     st.title("Gear Defect Detection")
     st.caption("Zero-shot industrial anomaly detection powered by AnomalyCLIP.")
 
-    cloud_env = _cloud_env()
-    cloud = cloud_env is not None
-
     if not Path(DEFAULT_CHECKPOINT).exists():
-        if cloud:
-            st.error(
-                "Model checkpoint not found at `models/anomalyclip.pth`.\n\n"
-                "This file should have been committed to the repository. "
-                "Verify it's present in your GitHub repo and redeploy."
-            )
-        else:
-            st.error(
-                "Model checkpoint not found.\n\n"
-                "Run **`bash scripts/setup.sh`** in your terminal once to download "
-                "the pretrained AnomalyCLIP weights, then refresh this page."
-            )
+        st.error(
+            "Model checkpoint not found at `models/anomalyclip.pth`.\n\n"
+            "This file should have been committed to the repository. "
+            "Verify it's present in your GitHub repo and redeploy."
+        )
         st.stop()
 
     with st.sidebar:
@@ -141,10 +109,6 @@ def main() -> None:
         device_label = "GPU (CUDA)" if device == "cuda" else "CPU"
         st.markdown(f"**Device:** `{device_label}`")
         st.markdown(f"**Checkpoint:** `{DEFAULT_CHECKPOINT.name}`")
-        if cloud_env == "hf":
-            st.markdown("**Environment:** `Hugging Face Spaces`")
-        elif cloud_env == "streamlit":
-            st.markdown("**Environment:** `Streamlit Cloud`")
         with st.expander("How it works"):
             st.markdown(
                 "AnomalyCLIP learns generic *normal* and *abnormal* text "
@@ -152,19 +116,6 @@ def main() -> None:
                 "zero-shot to any new object class — no gear samples or "
                 "retraining required.\n\n"
                 "Outputs: per-pixel heatmap + image-level anomaly score."
-            )
-        st.divider()
-        if not cloud:
-            st.markdown(
-                "**Continuous webcam mode** opens a native window:\n\n"
-                "```bash\nbash scripts/webcam.sh\n```"
-            )
-            st.markdown(f"Outputs save to `{OUTPUTS_DIR.name}/`")
-        else:
-            st.markdown(
-                "Continuous webcam mode (native OpenCV window) is "
-                "**local-only** and unavailable on Streamlit Cloud. "
-                "Use the **Webcam snapshot** tab for browser-side capture."
             )
 
     upload_tab, webcam_tab = st.tabs(["Upload image", "Webcam snapshot"])
@@ -183,10 +134,7 @@ def main() -> None:
                 _render_result(result)
 
     with webcam_tab:
-        st.markdown(
-            "Take a snapshot using your browser's webcam — a one-shot "
-            "alternative to the native OpenCV window."
-        )
+        st.markdown("Take a snapshot using your browser's webcam.")
         snap = st.camera_input("Snapshot")
         if snap is not None:
             image = Image.open(snap).convert("RGB")

@@ -1,7 +1,7 @@
 """AnomalyCLIP loader: cached, zero-shot, ready to predict.
 
-Patches sys.path so the vendored AnomalyCLIP repo (cloned by scripts/setup.sh
-into vendor/AnomalyCLIP) can be imported as a sibling package.
+Patches sys.path so the vendored AnomalyCLIP code at vendor/AnomalyCLIP
+can be imported as a sibling package.
 """
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def _ensure_vendor_on_path() -> None:
     if not ANOMALYCLIP_DIR.exists():
         raise FileNotFoundError(
             f"AnomalyCLIP source not found at {ANOMALYCLIP_DIR}. "
-            "Run `bash scripts/setup.sh` first to clone it."
+            "Verify vendor/AnomalyCLIP is committed to the repo."
         )
     p = str(ANOMALYCLIP_DIR)
     if p not in sys.path:
@@ -85,7 +85,7 @@ def get_model(
     if not ckpt.exists():
         raise FileNotFoundError(
             f"Checkpoint not found: {ckpt}\n"
-            "Run `bash scripts/setup.sh` to download it."
+            "Verify models/anomalyclip.pth is committed to the repo."
         )
 
     _ensure_vendor_on_path()
