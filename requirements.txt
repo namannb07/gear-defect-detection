@@ -1,0 +1,23 @@
+# Streamlit Community Cloud install file (pip-managed).
+# Locally we use uv + pyproject.toml; this mirrors the runtime deps for the
+# cloud, with CPU-only torch wheels to fit within the free-tier resource
+# limits.
+#
+# Streamlit Cloud uses Linux x86_64 + Python 3.11 (see runtime.txt). The two
+# direct PyTorch URLs below pin known-good CPU wheels for that platform;
+# everything else resolves from PyPI as normal.
+
+torch @ https://download.pytorch.org/whl/cpu/torch-2.5.1%2Bcpu-cp311-cp311-linux_x86_64.whl
+torchvision @ https://download.pytorch.org/whl/cpu/torchvision-0.20.1%2Bcpu-cp311-cp311-linux_x86_64.whl
+
+streamlit>=1.30
+opencv-python-headless>=4.8
+numpy>=1.26,<2.3
+pillow>=10.0
+scipy>=1.11
+matplotlib>=3.8
+ftfy>=6.1
+regex>=2024.4
+tqdm>=4.66
+thop>=0.1.1
+requests>=2.31

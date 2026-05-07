@@ -1,0 +1,50 @@
+# uv / Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Project artifacts
+outputs/*
+!outputs/.gitkeep
+
+# Vendor source IS committed (Streamlit Cloud needs it to import AnomalyCLIP_lib).
+# Local-only AnomalyCLIP training artifacts though:
+vendor/AnomalyCLIP/checkpoints/
+vendor/AnomalyCLIP/results/
+vendor/AnomalyCLIP/__pycache__/
+vendor/AnomalyCLIP/AnomalyCLIP_lib/__pycache__/
+
+# models/anomalyclip.pth IS committed (22 MB, well under GitHub's 100 MB limit).
+# Anything else in models/ is local-only:
+models/*.tmp
+models/*.bak
+
+# User datasets (not tracked, but keep folder structure)
+datasets/**/*.png
+datasets/**/*.jpg
+datasets/**/*.jpeg
+datasets/**/*.bmp
+datasets/**/*.tiff
+!datasets/**/.gitkeep
+
+# Sample images uploaded by user
+samples/*
+!samples/.gitkeep
+
+# Lightning / training logs (in case anyone retrains)
+lightning_logs/
+results/
+checkpoints_local/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+~$*
+.idea/
+.vscode/
+.claude/
+
+# Local Python version pin (Streamlit Cloud reads runtime.txt instead)
+.python-version
